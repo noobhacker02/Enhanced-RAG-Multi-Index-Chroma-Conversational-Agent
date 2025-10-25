@@ -1,145 +1,211 @@
-Enhanced RAG + Multi-Index Chroma Conversational Agent
+# 🧠 Enhanced RAG + Multi-Index Chroma Conversational Agent
 
-A conversational AI agent built using LangChain, Chroma, and Google Gemini, capable of retrieval-augmented generation (RAG) across multiple domains with persistent memory. This agent can process PDFs, index them into domain-specific vector stores, and answer user queries using both indexed documents and tools like a calculator.
+A **conversational AI system** combining **Retrieval-Augmented Generation (RAG)** with **Google Gemini**, **LangChain**, and **Chroma** for multi-domain document intelligence.
 
-Features
+This agent can process PDFs, store them in persistent vector databases by domain, and answer queries using both retrieved context and tools — all while maintaining **persistent chat memory** across sessions.
 
-Persistent Chroma Vector Store
-Multi-collection, domain-specific storage for document embeddings. Incremental indexing with duplicate avoidance.
+---
 
-RAG with Google Gemini
-Uses ChatGoogleGenerativeAI for LLM-based responses enhanced with relevant document context.
+## 🚀 Features
 
-Persistent Conversation Memory
-Stores chat history in a JSON file to maintain continuity across sessions.
+- **🧩 Multi-domain Chroma Vector Store**
+  - Persistent storage with separate collections for each domain.
+  - Incremental indexing with duplicate detection.
 
-Tools Integration
+- **💬 Retrieval-Augmented Generation (RAG)**
+  - Uses Google Gemini (`ChatGoogleGenerativeAI`) for context-aware answers.
+  - Includes a query rewriting chain to improve search accuracy.
 
-Calculator for arithmetic queries.
+- **🧠 Persistent Memory**
+  - Conversation history is stored in a JSON file and automatically loaded on startup.
 
-RAGRetriever for document-based question answering.
+- **🛠️ Built-in Tools**
+  - **Calculator** for arithmetic queries.
+  - **RAGRetriever** for document-based question answering.
 
-Metadata-rich Documents
-PDF chunks are stored with metadata including source, page, chunk, and domain.
+- **📄 Rich Metadata**
+  - Each document chunk stores `source`, `page`, `chunk`, and `domain` metadata.
 
-Query Rewriter Chain
-Rewrites user queries for better retrieval results.
+- **🧮 CLI Interface**
+  - Interactive terminal with options to upload PDFs, list stored files, ask questions, and manage memory.
 
-Hybrid Retrieval
-Combines vector similarity search and keyword matching for robust document retrieval.
+---
 
-CLI Interface
-Interactive menu to upload PDFs, list indexed documents, ask questions, and manage memory.
+## 🧰 Requirements
 
-Requirements
+### Python
+- Python 3.10 or later
 
-Python 3.10+
-
-Packages:
-
+### Install Dependencies
+```bash
 pip install langchain langchain-google-genai chromadb sentence-transformers PyMuPDF python-dotenv
+````
 
+### Environment Variables
 
-Environment Variables
-Create a .env file with the following keys:
+Create a `.env` file in your project root:
 
-GOOGLE_API_KEY=<your_google_api_key>
+```bash
+GOOGLE_API_KEY=your_google_api_key_here
 GEMINI_MODEL=gemini-2.0-flash
 EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+```
 
-Installation
+---
 
-Clone this repository:
+## ⚙️ Setup & Run
 
-git clone <repo_url>
-cd <repo_folder>
+### 1. Clone the Repository
 
+```bash
+git clone https://github.com/your-username/enhanced-rag-agent.git
+cd enhanced-rag-agent
+```
 
-Install dependencies:
+### 2. Run the Script
 
-pip install -r requirements.txt
-
-
-Set up .env with your Google API key and optional model names.
-
-Usage
-
-Run the conversational agent:
-
+```bash
 python main.py
+```
 
+You’ll see the CLI menu:
 
-You will see the CLI menu:
+```
+1) Upload PDFs to index
+2) List indexed PDFs
+3) Ask a question (Agent handles RAG/Tools/Chat)
+4) Run example queries
+5) Clear Memory
+6) Exit
+```
 
-Upload PDFs to index – Select PDFs to split into chunks and index into Chroma.
+---
 
-List indexed PDFs – Shows all PDFs stored per domain.
+## 🧾 How It Works
 
-Ask a question – Agent will handle RAG retrieval, tools, and memory-based answers.
+### 1. **PDF Ingestion**
 
-Run example queries – Quick demonstration queries to test agent capabilities.
+* Select PDFs using a file picker.
+* Text is extracted, split into overlapping chunks, and stored in Chroma with embeddings.
+* Domains are detected automatically (e.g., `finance`, `legal`, `research`).
 
-Clear Memory – Resets persistent conversation history.
+### 2. **Incremental Indexing**
 
-Exit – Quit the application.
+* The system hashes each PDF to detect updates.
+* If a file is unchanged, it’s skipped to save time.
 
-PDF Processing & Indexing
+### 3. **Retrieval-Augmented Generation (RAG)**
 
-PDFs are split into chunks with customizable chunk_size and chunk_overlap.
+* On each question:
 
-Metadata is stored for each chunk (source, page, chunk, domain).
+  1. Query is rewritten for clarity.
+  2. Relevant chunks are retrieved from the matching domain.
+  3. Gemini generates a grounded response using only that context.
 
-Duplicate chunks are ignored during re-indexing.
+### 4. **Memory**
 
-Domain detection is automatic based on content keywords, or manually specified.
+* Every conversation turn is stored in `conversation_history.json`.
+* When relaunched, the agent continues from previous sessions.
 
-Tools
+---
 
-Calculator – Safely evaluates arithmetic expressions.
+## 📚 Domain Mapping
 
-RAGRetriever – Answers questions using indexed document chunks.
+| Domain       | Keywords                                       |
+| ------------ | ---------------------------------------------- |
+| **legal**    | law, contract, agreement, court, legal         |
+| **finance**  | invoice, payment, finance, budget, tax         |
+| **research** | chapter, study, research, methodology, results |
+| **general**  | fallback for uncategorized content             |
 
-Persistent Memory
+---
 
-Conversation history is stored in conversation_history.json.
+## 🧮 Tools Overview
 
-Automatically loaded at startup and saved after each interaction.
+| Tool             | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| **Calculator**   | Evaluates safe mathematical expressions          |
+| **RAGRetriever** | Answers questions using indexed document content |
 
-Memory is shared with the agent for context-aware responses.
+---
 
-Domain Mapping (Default)
-Domain	Keywords
-legal	law, contract, agreement, court, legal
-finance	invoice, payment, finance, budget, tax
-research	chapter, study, research, methodology, results
-general	fallback domain for unmatched content
-Example Queries
+## 🧑‍💻 Example Queries
 
+```text
 Hi, my name is Alex.
+What is 25 * 6?
+Summarize the uploaded research paper.
+What was my previous question?
+```
 
-What is 25*6?
+---
 
-Summarize the main points from the uploaded PDF on finance.
+## 📂 Project Structure
 
-The agent uses both tools and RAG to provide accurate, context-aware answers.
-
-File Structure
+```
 .
-├── main.py                  # Entry point for the agent CLI
-├── conversation_history.json # Persistent memory storage
-├── chroma_db/               # Chroma vector store directory
-├── pdf_cache.json           # Tracks processed PDFs to avoid duplicates
-├── requirements.txt         # Python dependencies
-└── .env                     # API keys and model configs
+├── main.py                     # Main application file
+├── chroma_db/                  # Vector database directory
+├── conversation_history.json    # Persistent chat memory
+├── pdf_cache.json               # Hash cache for PDFs
+├── requirements.txt             # Python dependencies
+└── .env                         # Environment variables
+```
 
-Notes
+---
 
-Ensure your Google API key is valid and has access to Gemini.
+## 🧼 Maintenance Commands
 
-Memory and vector store are persistent, allowing multi-session usage.
+**Clear Memory**
 
-Incremental PDF indexing avoids reprocessing unchanged files.
+```bash
+rm conversation_history.json
+```
 
-License
+**Delete Chroma Database**
 
-MIT License – Feel free to use and modify.
+```bash
+rm -rf chroma_db/
+```
+
+---
+
+## ⚠️ Notes
+
+* Make sure your **Google API key** has access to the Gemini model.
+* The system avoids hallucination by grounding responses strictly to context.
+* Persistent memory ensures continuity across restarts.
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** — you can use, modify, and distribute it freely.
+
+---
+
+## 🤝 Contributing
+
+Pull requests and improvements are welcome!
+If you find a bug or want to extend features (e.g., new tools, APIs, or domain detection), feel free to open an issue.
+
+---
+
+### 💡 Future Enhancements
+
+* Add vector-based summarization.
+* Implement embedding caching.
+* Integrate web document and YouTube transcript loaders.
+* Deploy as a web app using Streamlit or Gradio.
+
+---
+
+**Author:** Talha Shaikh
+**Tech Stack:** Python • LangChain • Chroma • Google Gemini • HuggingFace
+
+```
+
+---
+
+Would you like me to include a matching **`requirements.txt`** and **`.env.example`** section (to make the repo plug-and-play for others)?
+```
