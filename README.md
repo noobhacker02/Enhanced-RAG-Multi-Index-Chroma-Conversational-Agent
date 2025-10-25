@@ -1,76 +1,145 @@
+Enhanced RAG + Multi-Index Chroma Conversational Agent
+
+A conversational AI agent built using LangChain, Chroma, and Google Gemini, capable of retrieval-augmented generation (RAG) across multiple domains with persistent memory. This agent can process PDFs, index them into domain-specific vector stores, and answer user queries using both indexed documents and tools like a calculator.
+
+Features
+
+Persistent Chroma Vector Store
+Multi-collection, domain-specific storage for document embeddings. Incremental indexing with duplicate avoidance.
+
+RAG with Google Gemini
+Uses ChatGoogleGenerativeAI for LLM-based responses enhanced with relevant document context.
+
+Persistent Conversation Memory
+Stores chat history in a JSON file to maintain continuity across sessions.
+
+Tools Integration
+
+Calculator for arithmetic queries.
+
+RAGRetriever for document-based question answering.
+
+Metadata-rich Documents
+PDF chunks are stored with metadata including source, page, chunk, and domain.
+
+Query Rewriter Chain
+Rewrites user queries for better retrieval results.
+
+Hybrid Retrieval
+Combines vector similarity search and keyword matching for robust document retrieval.
+
+CLI Interface
+Interactive menu to upload PDFs, list indexed documents, ask questions, and manage memory.
+
+Requirements
+
+Python 3.10+
+
+Packages:
+
+pip install langchain langchain-google-genai chromadb sentence-transformers PyMuPDF python-dotenv
 
 
-### ⚙️ Your Current Code — *LangChain Agent + Memory + Chroma RAG*
+Environment Variables
+Create a .env file with the following keys:
 
-This setup uses:
+GOOGLE_API_KEY=<your_google_api_key>
+GEMINI_MODEL=gemini-2.0-flash
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 
-* `initialize_agent()` from **LangChain**
-* `ConversationBufferMemory`
-* `Chroma` for persistent retrieval
-* `LLMChain` for query rewriting & chat
-* Google Gemini as your LLM
+Installation
 
-✅ **Pros:**
+Clone this repository:
 
-* Simple and modular — everything fits in one file.
-* Directly integrates with Chroma, HuggingFace embeddings, and tools.
-* Works perfectly for CLI or single-user chatbot.
-* You can add tools, memory, and chains easily (like you’ve done).
-
-❌ **Cons:**
-
-* Agents re-evaluate the entire prompt every time → not the best efficiency for large or multi-turn logic.
-* Hard to visualize logic flow (which branch executes what).
-* Harder to manage *multi-step reasoning pipelines* or *state control* between components.
-* Debugging complex flow (e.g., combining multiple retrievers + memory) is messy.
-
----
-
-### 🧠 LangGraph — *LangChain’s successor for structured reasoning graphs*
-
-LangGraph is built **on top of LangChain**, but gives you:
-
-* A **graph-based architecture** for your workflow — every component (LLM, retriever, memory, tool) is a node.
-* You define **how data flows** between nodes → e.g., Query → Rewrite → Retrieve → Rerank → Answer → Store Memory.
-* **Persistent graph state** (so memory works seamlessly even across sessions).
-* **Fine control** over how context is merged (you can combine memory, retrieved docs, and prior turns elegantly).
-* **Async and streaming-friendly** out of the box.
-
-✅ **Pros:**
-
-* Best for **multi-turn conversational systems**, **agentic workflows**, and **RAG pipelines**.
-* State management is cleaner — chat history, document store, variables all persist.
-* You can visualize and debug flows.
-* Perfect for when you’ll **expand the system** (e.g., adding vision model, summarizer, classifier, planner).
-
-❌ **Cons:**
-
-* Slightly more setup complexity (you need to define nodes and edges).
-* Overkill for small single-user chat CLI tools.
-
----
-
-### 💡 Verdict (for your setup)
-
-| Use Case                                                                          | Better Choice                        |
-| --------------------------------------------------------------------------------- | ------------------------------------ |
-| Quick RAG + Agent chatbot with memory                                             | ✅ **LangChain (your current setup)** |
-| Persistent, multi-user, modular assistant or AI app                               | 🧠 **LangGraph**                     |
-| You want to build a **“system”** that reasons, plans, and calls tools dynamically | 🧠 **LangGraph**                     |
-| You want a **simple CLI / local tool**                                            | ⚙️ **LangChain**                     |
-
----
-
-### 🔄 My Recommendation for *You, Talha*
-
-Since you already have:
-
-* Persistent Chroma RAG
-* Google Gemini API
-* Working LangChain agent
-
-👉 Stick with **LangChain** for now while you finalize the functionality.
-Once you want to **expand** (e.g., multiple agents, better long-term memory, or LangSmith tracking), I can help you **convert this exact script into a LangGraph flow** — without losing any of your logic.
+git clone <repo_url>
+cd <repo_folder>
 
 
+Install dependencies:
 
+pip install -r requirements.txt
+
+
+Set up .env with your Google API key and optional model names.
+
+Usage
+
+Run the conversational agent:
+
+python main.py
+
+
+You will see the CLI menu:
+
+Upload PDFs to index – Select PDFs to split into chunks and index into Chroma.
+
+List indexed PDFs – Shows all PDFs stored per domain.
+
+Ask a question – Agent will handle RAG retrieval, tools, and memory-based answers.
+
+Run example queries – Quick demonstration queries to test agent capabilities.
+
+Clear Memory – Resets persistent conversation history.
+
+Exit – Quit the application.
+
+PDF Processing & Indexing
+
+PDFs are split into chunks with customizable chunk_size and chunk_overlap.
+
+Metadata is stored for each chunk (source, page, chunk, domain).
+
+Duplicate chunks are ignored during re-indexing.
+
+Domain detection is automatic based on content keywords, or manually specified.
+
+Tools
+
+Calculator – Safely evaluates arithmetic expressions.
+
+RAGRetriever – Answers questions using indexed document chunks.
+
+Persistent Memory
+
+Conversation history is stored in conversation_history.json.
+
+Automatically loaded at startup and saved after each interaction.
+
+Memory is shared with the agent for context-aware responses.
+
+Domain Mapping (Default)
+Domain	Keywords
+legal	law, contract, agreement, court, legal
+finance	invoice, payment, finance, budget, tax
+research	chapter, study, research, methodology, results
+general	fallback domain for unmatched content
+Example Queries
+
+Hi, my name is Alex.
+
+What is 25*6?
+
+Summarize the main points from the uploaded PDF on finance.
+
+The agent uses both tools and RAG to provide accurate, context-aware answers.
+
+File Structure
+.
+├── main.py                  # Entry point for the agent CLI
+├── conversation_history.json # Persistent memory storage
+├── chroma_db/               # Chroma vector store directory
+├── pdf_cache.json           # Tracks processed PDFs to avoid duplicates
+├── requirements.txt         # Python dependencies
+└── .env                     # API keys and model configs
+
+Notes
+
+Ensure your Google API key is valid and has access to Gemini.
+
+Memory and vector store are persistent, allowing multi-session usage.
+
+Incremental PDF indexing avoids reprocessing unchanged files.
+
+License
+
+MIT License – Feel free to use and modify.
